@@ -17,22 +17,25 @@
      ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
      ;; <M-m f e R> (Emacs style) to install them.
      ;; ----------------------------------------------------------------
-      auto-completion
-      better-defaults
+     auto-completion
+     better-defaults
      emacs-lisp
      osx
-      git
-      markdown
-      org
+     git
+     github
+     markdown
+     org
      ;; (shell :variables
      ;;        shell-default-height 30
-      ;;        shell-default-position 'bottom)
-      semantic
-      syntax-checking
-      version-control
-      c-c++
-      latex
-      go
+     ;;        shell-default-position 'bottom)
+     semantic
+     stack-exchange
+     syntax-checking
+     version-control
+     c-c++
+     latex
+     go
+     gtags
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
@@ -165,7 +168,7 @@ before layers configuration."
   "Configuration function.
  This function is called at the very end of Spacemacs initialization after
 layers configuration."
-)
+  )
 
 ;; Do not write anything past this comment. This is where Emacs will
 ;; auto-generate custom variable definitions.
