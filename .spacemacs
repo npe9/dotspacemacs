@@ -23,6 +23,7 @@
      osx
      git
      github
+     fortran
      markdown
      org
      ;; (shell :variables
@@ -55,6 +56,7 @@ This function is called at the very startup of Spacemacs initialization
 before layers configuration."
   ;; This setq-default sexp is an exhaustive list of all the supported
   ;; spacemacs settings.
+  (setq c-c++-enable-clang-support t)
   (setq-default
    ;; Either `vim' or `emacs'. Evil is always enabled but if the variable
    ;; is `emacs' then the `holy-mode' is enabled at startup.
@@ -168,6 +170,12 @@ before layers configuration."
   "Configuration function.
  This function is called at the very end of Spacemacs initialization after
 layers configuration."
+  (setq paradox-github-token "paradox-limited")
+  (add-hook 'my-mode-hook 'imenu-add-menubar-index)
+  (setq tab-always-indent 'complete)
+  (add-to-list 'completion-styles 'initials t)
+  (require 'jka-compr)
+
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
