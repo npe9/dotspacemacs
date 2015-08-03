@@ -19,24 +19,26 @@
      ;; ----------------------------------------------------------------
      auto-completion
      better-defaults
+     c-c++
+     coq
      emacs-lisp
-     osx
+     fortran
      git
      github
-     fortran
+     gtags
+     latex
      markdown
+     ocaml
      org
-     ;; (shell :variables
-     ;;        shell-default-height 30
-     ;;        shell-default-position 'bottom)
+     osx
+     perl
      semantic
      stack-exchange
      syntax-checking
      version-control
-     c-c++
-     latex
-     go
-     gtags
+     ;; (shell :variables
+     ;;        shell-default-height 30
+     ;;        shell-default-position 'bottom)
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
@@ -57,6 +59,7 @@ before layers configuration."
   ;; This setq-default sexp is an exhaustive list of all the supported
   ;; spacemacs settings.
   (setq c-c++-enable-clang-support t)
+  (setq auto-completion-tab-key-behavior 'complete)
   (setq-default
    ;; Either `vim' or `emacs'. Evil is always enabled but if the variable
    ;; is `emacs' then the `holy-mode' is enabled at startup.
@@ -166,14 +169,18 @@ before layers configuration."
   ;; User initialization goes here
   )
 
+(load-file "/Users/npe/.emacs.d/private/proof-general/generic/proof-site.el")
+(setq coq-load-path '("/Users/npe/Google Drive/cs550/theories/Arith/") )
+
+
 (defun dotspacemacs/config ()
   "Configuration function.
  This function is called at the very end of Spacemacs initialization after
 layers configuration."
   (setq paradox-github-token "paradox-limited")
   (add-hook 'my-mode-hook 'imenu-add-menubar-index)
-  (setq tab-always-indent 'complete)
-  (add-to-list 'completion-styles 'initials t)
+;;  (setq tab-always-indent 'complete)
+;;  (add-to-list 'completion-styles 'initials t)
   (require 'jka-compr)
 
   )
