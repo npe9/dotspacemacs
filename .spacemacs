@@ -12,6 +12,7 @@
    ;; of a list then all discovered layers will be installed.
    dotspacemacs-configuration-layers
    '(
+     racket
      ;; ----------------------------------------------------------------
      ;; Example of useful layers you may want to use right away.
      ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
@@ -20,21 +21,30 @@
      auto-completion
      better-defaults
      c-c++
-     coq
+     chapel
+     ;;coq
      emacs-lisp
-     fortran
+     ess
+     ;;fortran
      git
      github
+     go
      gtags
+     haskell
      latex
      markdown
      ocaml
      org
      osx
+     python
      perl
+     racket
+     shell
      semantic
-     stack-exchange
+     sml
+     ;;stack-exchange
      syntax-checking
+     yaml
      version-control
      ;; (shell :variables
      ;;        shell-default-height 30
@@ -167,23 +177,67 @@ before layers configuration."
    dotspacemacs-default-package-repository nil
    )
   ;; User initialization goes here
+  (require 'tramp)
+  (setq tramp-default-method "ssh")
+  (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
+  (add-to-list 'load-path "/Users/npe/src/guess-style")
+  (autoload 'guess-style-set-variable "guess-style" nil t)
+  (autoload 'guess-style-guess-variable "guess-style")
+  (autoload 'guess-style-guess-all "guess-style" nil t)
+  (add-hook 'cc-mode-hook 'guess-style-guess-all)
+  (setq paradox-github-token "paradox-limited")
+
+  (add-hook 'my-mode-hook 'imenu-add-menubar-index)
+  ;;  (setq tab-always-indent 'complete)
+  ;;  (add-to-list 'completion-styles 'initials t)
+  (require 'jka-compr)
+  (define-key key-translation-map (kbd "M-¥") (kbd "\\"))
+  (load-file "/Users/npe/.emacs.d/private/promela-mode/promela-mode.el")
+  (load-file "/Users/npe/.emacs.d/private/qemu-mode/qemu-mode.el")
+  (load-file "/Users/npe/.emacs.d/private/proof-general/generic/proof-site.el")
+  (setq coq-prog-args '("-R" "/Users/npe/src/ynot/src/coq" "Ynot"
+                        "-R" "/Users/npe/src/ynot/examples/IO" "IO"
+                        ))
+  (add-to-list 'package-archives
+               '("emacs-pe" . "https://emacs-pe.github.io/packages/"))
+
+  (setq tramp-ssh-controlmaster-options
+        (concat
+         "-o ControlPath=~/.ssh/master-%%r@%%h:%%p "
+         "-o ControlMaster=auto -o ControlPersist=yes"))
+  (setq tramp-use-ssh-controlmaster-options nil)
+  (add-to-list 'tramp-remote-path "/home/npe/bin")
+  (eval-after-load 'tramp '(setenv "SHELL" "/bin/bash"))
+  (add-to-list 'auto-mode-alist '("\\.chpl$" . chapel-mode))
+  ;;(add-hook ’LaTeX-mode-hook ’LaTeX-math-mode)
+  (makunbound 'LaTeX-math-abbrev-prefix)
+  (setq LaTeX-math-abbrev-prefix "@")
   )
+;; need to add that function
+(defun open-importante () (interactive) (find-file "/crayadm@importante:/home/crayadm/hobbes/scripts/"))
+(defun open-hobbesxt   () (interactive) (find-file "/hobbesxt:/home/npe/nvl.clean/src/nvl/pisces/"))
 
-(load-file "/Users/npe/.emacs.d/private/proof-general/generic/proof-site.el")
-(setq coq-load-path '("/Users/npe/Google Drive/cs550/theories/Arith/") )
-
+(defun open-both () (interactive) (tramp-cleanup-all-connections) (open-importante) (shell "*shell importante*") (open-hobbesxt) (shell "*shell hobbesxt*"))
 
 (defun dotspacemacs/config ()
   "Configuration function.
  This function is called at the very end of Spacemacs initialization after
 layers configuration."
-  (setq paradox-github-token "paradox-limited")
-  (add-hook 'my-mode-hook 'imenu-add-menubar-index)
-;;  (setq tab-always-indent 'complete)
-;;  (add-to-list 'completion-styles 'initials t)
-  (require 'jka-compr)
-
   )
+;; I want an easy command for opening new shells:
+(defun new-shell (name)
+  "Opens a new shell buffer with the given name in
+asterisks (*name*) in the current directory and changes the
+prompt to 'name>'."
+  (interactive "sName: ")
+  (pop-to-buffer (concat "*" name "*"))
+  (unless (eq major-mode 'shell-mode)
+    (shell (current-buffer))
+    (sleep-for 0 200)
+    (delete-region (point-min) (point-max))
+    (comint-simple-send (get-buffer-process (current-buffer))
+                        (concat "export PS1=\"\033[33m" name "\033[0m:\033[35m\\W\033[0m>\""))))
+(global-set-key (kbd "C-c s") 'new-shell)
 
 ;; Do not write anything past this comment. This is where Emacs will
 ;; auto-generate custom variable definitions.
@@ -192,16 +246,48 @@ layers configuration."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ahs-case-fold-search nil)
- '(ahs-default-range (quote ahs-range-whole-buffer))
- '(ahs-idle-interval 0.25)
+ '(ahs-case-fold-search nil t)
+ '(ahs-default-range (quote ahs-range-whole-buffer) t)
+ '(ahs-idle-interval 0.25 t)
  '(ahs-idle-timer 0 t)
- '(ahs-inhibit-face-list nil)
+ '(ahs-inhibit-face-list nil t)
  '(ede-project-directories (quote ("/Users/npe/src/melpa/working/proof-general")))
- '(ring-bell-function (quote ignore) t))
+ '(ess-R-font-lock-keywords
+   (quote
+    ((ess-R-fl-keyword:modifiers . t)
+     (ess-R-fl-keyword:fun-defs . t)
+     (ess-R-fl-keyword:keywords . t)
+     (ess-R-fl-keyword:assign-ops . t)
+     (ess-R-fl-keyword:constants . t)
+     (ess-fl-keyword:fun-calls . t)
+     (ess-fl-keyword:numbers . t)
+     (ess-fl-keyword:operators . t)
+     (ess-fl-keyword:delimiters . t)
+     (ess-fl-keyword:= . t)
+     (ess-R-fl-keyword:F&T . t)
+     (ess-R-fl-keyword:%op% . t))))
+ '(package-selected-packages
+   (quote
+    (perlbrew perl6-mode perl-completion lang-refactor-perl helm-perldoc deferred flymake-perlcritic flycheck-perl6 racket-mode faceup ess-smart-equals ess-R-object-popup ess-R-data-view ctable ess julia-mode chapel-mode bracketed-paste realgud go-guru yapfify yaml-mode xterm-color ws-butler window-numbering which-key volatile-highlights vi-tilde-fringe uuidgen utop use-package tuareg toc-org stickyfunc-enhance srefactor spacemacs-theme spaceline solarized-theme smeargle shell-pop reveal-in-osx-finder restart-emacs rainbow-delimiters quelpa pyvenv pytest pyenv-mode py-isort popwin pip-requirements persp-mode pcre2el pbcopy paradox osx-trash osx-dictionary orgit org-projectile org-present org-pomodoro org-plus-contrib org-download org-bullets open-junk-file ocp-indent ob-sml neotree mwim multi-term move-text mmm-mode merlin markdown-toc magit-gitflow magit-gh-pulls macrostep lorem-ipsum live-py-mode linum-relative link-hint launchctl intero info+ indent-guide ido-vertical-mode hy-mode hungry-delete htmlize hlint-refactor hl-todo hindent highlight-parentheses highlight-numbers highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-pydoc helm-projectile helm-mode-manager helm-make helm-hoogle helm-gtags helm-gitignore helm-flx helm-descbinds helm-company helm-c-yasnippet helm-ag haskell-snippets google-translate golden-ratio go-eldoc gnuplot github-search github-clone github-browse-file gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gist gh-md ggtags flycheck-pos-tip flycheck-haskell flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu eshell-z eshell-prompt-extras esh-help elisp-slime-nav dumb-jump disaster diff-hl cython-mode company-statistics company-go company-ghci company-ghc company-cabal company-c-headers company-auctex company-anaconda column-enforce-mode cmm-mode cmake-mode clean-aindent-mode clang-format auto-yasnippet auto-highlight-symbol auto-compile auctex-latexmk aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line ac-ispell)))
+ '(ring-bell-function (quote ignore))
+ '(safe-local-variable-values
+   (quote
+    ((eval set
+           (make-local-variable
+            (quote nateeag/dir-locals-dir))
+           (file-name-directory
+            (let
+                ((d
+                  (dir-locals-find-file ".")))
+              (if
+                  (stringp d)
+                  d
+                (car d)))))
+     (eval guess-style-guess-all)))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(company-tooltip-common ((t (:inherit company-tooltip :weight bold :underline nil))))
+ '(company-tooltip-common-selection ((t (:inherit company-tooltip-selection :weight bold :underline nil)))))
